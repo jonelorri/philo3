@@ -1,71 +1,100 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jelorria <jelorria@student.42urduli>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/11 18:26:14 by jelorria          #+#    #+#             */
+/*   Updated: 2022/11/11 18:26:16 by jelorria         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
-int ft_init(t_param *param, char **argv, int argc)
+void	init_vals(t_p *p, char **argv, int argc)
 {
-    param->nbr_philo = ft_atoi(argv[1]);
-    param->tm_die = ft_atoi(argv[2]);
-    param->tm_eat = ft_atoi(argv[3]); 
-    param->tm_sleep = ft_atoi(argv[4]);
-    if (argc == 6)
-    {
-        param->nbr_eat = ft_atoi(argv[5]);
-        param->total_eat = malloc(sizeof(int));
-        *param->total_eat = 0;
-    }
-    if (argc == 5)
-    {
-        param->nbr_eat = 100000;
-        param->total_eat = malloc(sizeof(int));
-        *param->total_eat = 0;
-    }
-    param->is_dead = malloc(sizeof(int));
-    *param->is_dead = 0;
-    if (param->nbr_eat <= 0)
-    {
-        return (1);    
-    }
-	if (param->nbr_philo == 1)
-    {
-        printf("0 1 Has taken a Fork\n");
-        usleep((param->tm_die) * 1000);
-        printf("%d 1 Is dead\n", param->tm_die);
-        return (1);  
-    }
-    if (param->nbr_philo < 1)
-    {
-        printf("There are no philosophers\n");
-        return (1);  
-    }
-    if (param->tm_die <= 0 || param->tm_eat <= 0 || param->tm_sleep <= 0)
-    {
-        printf("Error\n");
-        return (1);
-    }
-    param->i = param->nbr_philo;
-    while (--param->i >= 0)
-    {
-        if (pthread_mutex_init(&(param->forks[param->i]), NULL))
-        {
-            printf("Error\n");
-            return (1);
-        }
-    }
-    if (pthread_mutex_init(&(param->print), NULL))
-    {
-        printf("Error\n");
-        return (1);
-    }
-    param->i = param->nbr_philo;
-	while (--param->i >= 0)
+	p->n_ph = ft_atoi(argv[1]);
+	p->tm_die = ft_atoi(argv[2]);
+	p->tm_eat = ft_atoi(argv[3]);
+	p->tm_sleep = ft_atoi(argv[4]);
+	if (argc == 6)
 	{
-		param->philo[param->i].id = param->i;
-		param->philo[param->i].last_meal = malloc(sizeof(int));
-		*param->philo[param->i].last_meal = 0;
-        param->philo[param->i].nbr_meal = malloc(sizeof(int));
-		*param->philo[param->i].nbr_meal = 0;
-		param->philo[param->i].l_fork = param->i;
-		param->philo[param->i].r_fork = (param->i + 1) % param->nbr_philo; // 0%5=0 / 1%5=1 / 2%5=2 .../ 5%5=0
-		param->philo[param->i].param = param; //enlazo la estructura de dentro con la de fuera
+		p->nbr_eat = ft_atoi(argv[5]);
+		p->total_eat = malloc(sizeof(int));
+		*p->total_eat = 0;
 	}
-    return (0);
+	if (argc == 5)
+	{
+		p->nbr_eat = 100000;
+		p->total_eat = malloc(sizeof(int));
+		*p->total_eat = 0;
+	}
+	p->is_dead = malloc(sizeof(int));
+	*p->is_dead = 0;
+}
+
+int	init_mutex(t_p *p, char **argv, int argc)
+{
+	p->i = p->n_ph;
+	while (--p->i >= 0)
+	{
+		if (pthread_mutex_init(&(p->forks[p->i]), NULL))
+		{
+			printf("Error\n");
+			return (1);
+		}
+	}
+	if (pthread_mutex_init(&(p->print), NULL))
+	{
+		printf("Error\n");
+		return (1);
+	}
+	return (0);
+}
+
+int	check_vals(t_p *p, char **argv, int argc)
+{
+	if (p->nbr_eat <= 0)
+		return (1);
+	if (p->n_ph == 1)
+	{
+		printf("0 1 Has taken a Fork\n");
+		usleep((p->tm_die) * 1000);
+		printf("%d 1 Is dead\n", p->tm_die);
+		return (1);
+	}
+	if (p->n_ph < 1)
+	{
+		printf("There are no philosophers\n");
+		return (1);
+	}
+	if (p->tm_die <= 0 || p->tm_eat <= 0 || p->tm_sleep <= 0)
+	{
+		printf("Error\n");
+		return (1);
+	}
+	if (init_mutex(&*p, argv, argc))
+		return (1);
+	return (0);
+}
+
+int	ft_init(t_p *p, char **argv, int argc)
+{
+	init_vals(&*p, argv, argc);
+	if (check_vals(&*p, argv, argc))
+		return (1);
+	p->i = p->n_ph;
+	while (--p->i >= 0)
+	{
+		p->ph[p->i].id = p->i;
+		p->ph[p->i].last_meal = malloc(sizeof(int));
+		*p->ph[p->i].last_meal = 0;
+		p->ph[p->i].nbr_meal = malloc(sizeof(int));
+		*p->ph[p->i].nbr_meal = 0;
+		p->ph[p->i].l_fork = p->i;
+		p->ph[p->i].r_fork = (p->i + 1) % p->n_ph;
+		p->ph[p->i].p = p;
+	}
+	return (0);
 }

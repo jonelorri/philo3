@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jelorria <jelorria@student.42urduli>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/11 17:57:39 by jelorria          #+#    #+#             */
+/*   Updated: 2022/11/11 17:57:42 by jelorria         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 int	len(long m)
@@ -29,7 +41,7 @@ char	*ft_itoa(int n)
 	s[i--] = '\0';
 	if (m == 0)
 		s[0] = '0';
-	if (m < 0 )
+	if (m < 0)
 	{
 		s[0] = '-';
 		m = m * -1;
@@ -43,7 +55,7 @@ char	*ft_itoa(int n)
 	return (s);
 }
 
-int			ft_atoi(const char *str)
+int	ft_atoi(const char *str)
 {
 	long int	n;
 	int			sign;
