@@ -43,7 +43,7 @@ int    print_message(void *arg, char type)
     philo = *(t_philo *)arg;
     param = philo.param;
     pthread_mutex_lock(&param->print);
-    if (type == 'f' && *param->is_dead == 0)
+    if (type == 'f' && *param->is_dead == 0 && param->nbr_philo > *param->total_eat)
     {
         if (time_diff(param->start_time, timestamp()) >= (*philo.last_meal + param->tm_die))
         {
@@ -54,34 +54,34 @@ int    print_message(void *arg, char type)
         }
         printf("%lld %d Has taken a Fork\n", time_diff(param->start_time, timestamp()), philo.num);
     }
-    else if (type == 'e' && *param->is_dead == 0)
+    else if (type == 'e' && *param->is_dead == 0 && param->nbr_philo > *param->total_eat)
     {
         if (time_diff(param->start_time, timestamp()) >= (*philo.last_meal + param->tm_die))
         {
-            printf("%lld %d Is dead - -\n", time_diff(param->start_time, timestamp()), philo.num);
+            printf("%d %d Is dead - -\n", (*philo.last_meal + param->tm_die), philo.num);
             *param->is_dead = 1;
             pthread_mutex_unlock(&param->print);
             return (0);
         }
-        printf("%lld %d Is eating\n", time_diff(param->start_time, timestamp()), philo.num);
+        printf("%lld %d IS EATING\n", time_diff(param->start_time, timestamp()), philo.num);
         *philo.last_meal = time_diff(param->start_time, timestamp());
     }
-    else if (type == 's' && *param->is_dead == 0)
+    else if (type == 's' && *param->is_dead == 0 && param->nbr_philo > *param->total_eat)
     {
         if (time_diff(param->start_time, timestamp()) >= (*philo.last_meal + param->tm_die))
         {
-            printf("%lld %d Is dead - - -\n", time_diff(param->start_time, timestamp()), philo.num);
+            printf("%d %d Is dead - - -\n", (*philo.last_meal + param->tm_die), philo.num);
             *param->is_dead = 1;
             pthread_mutex_unlock(&param->print);
             return (0);
         }
         printf("%lld %d Is sleeping\n", time_diff(param->start_time, timestamp()), philo.num);
     }
-    else if (type == 't' && *param->is_dead == 0)
+    else if (type == 't' && *param->is_dead == 0 && param->nbr_philo > *param->total_eat)
     {
         if (time_diff(param->start_time, timestamp()) >= (*philo.last_meal + param->tm_die))
         {
-            printf("%lld %d Is dead +\n", time_diff(param->start_time, timestamp()), philo.num);
+            printf("%d %d Is dead +\n", (*philo.last_meal + param->tm_die), philo.num);
             *param->is_dead = 1;
             pthread_mutex_unlock(&param->print);
             return (0);
@@ -99,7 +99,7 @@ void*    routine(void *arg)
 
     philo = *(t_philo *)arg;
     param = philo.param;
-    while (*param->is_dead == 0)
+    while (*param->is_dead == 0 && param->nbr_philo > *param->total_eat)
     {
         if (philo.num % 2 == 0)
             usleep(100);
@@ -123,11 +123,13 @@ void*    routine(void *arg)
         if (!print_message(&param->philo[philo.num - 1], 'e'))
         {
             pthread_mutex_unlock(&param->forks[philo.r_fork]);
-            pthread_mutex_unlock(&param->forks[philo.l_fork]);
+            pthread_mutex_unlock(&param->forks[philo.l_fork]); 
             return 0;
         }
-
         smart_sleep(param->tm_eat, param, (philo.num - 1));
+        *philo.nbr_meal += 1;
+        if (*philo.nbr_meal == param->nbr_eat)
+            *param->total_eat += 1;
 
         pthread_mutex_unlock(&param->forks[philo.l_fork]);
         pthread_mutex_unlock(&param->forks[philo.r_fork]);
@@ -151,10 +153,15 @@ int main(int argc, char *argv[])
     if (argc != 5 && argc != 6)
     {
         write(1, "Invalid number of arguments\n", 28);
+        free(param.is_dead);
         return (0);
     }
-    if (ft_init(&param, argv) == 1)
+    if (ft_init(&param, argv, argc) == 1)
+    {
+        free(param.total_eat);
+        free(param.is_dead);
         return (0);
+    }
     param.i = 0;
     param.start_time = timestamp();
     while (param.i < param.nbr_philo)
@@ -170,9 +177,11 @@ int main(int argc, char *argv[])
         if (pthread_join(param.philo[param.i].thread_id, NULL))
             return 1;
         free(param.philo[param.i].last_meal);
+        free(param.philo[param.i].nbr_meal);
         param.i ++;
     }
 	free(param.is_dead);
+	free(param.total_eat);
     param.i = -1;
 	while (++param.i < param.nbr_philo)
 		pthread_mutex_destroy(&(param.forks[param.i]));
