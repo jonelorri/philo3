@@ -1,6 +1,5 @@
 #include "philo.h"
 
-//todo: cantidad de comidas
 //todo: norm
 
 void    smart_sleep(long long time, t_param *param, int nbr)
