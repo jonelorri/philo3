@@ -57,13 +57,6 @@ int	check_vals(t_p *p, char **argv, int argc)
 {
 	if (p->nbr_eat <= 0)
 		return (1);
-	if (p->n_ph == 1)
-	{
-		printf("0 1 Has taken a Fork\n");
-		usleep((p->tm_die) * 1000);
-		printf("%d 1 Is dead\n", p->tm_die);
-		return (1);
-	}
 	if (p->n_ph < 1)
 	{
 		printf("There are no philosophers\n");
@@ -72,6 +65,13 @@ int	check_vals(t_p *p, char **argv, int argc)
 	if (p->tm_die <= 0 || p->tm_eat <= 0 || p->tm_sleep <= 0)
 	{
 		printf("Error\n");
+		return (1);
+	}
+	if (p->n_ph == 1)
+	{
+		printf("0 1 Has taken a Fork\n");
+		usleep((p->tm_die) * 1000);
+		printf("%d 1 Is dead\n", p->tm_die);
 		return (1);
 	}
 	if (init_mutex(&*p, argv, argc))

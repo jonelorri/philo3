@@ -34,7 +34,6 @@ void*    routine(void *arg)
 		*ph.nbr_meal += 1;
 		if (*ph.nbr_meal == p->nbr_eat)
 			*p->total_eat += 1;
-
 		pthread_mutex_unlock(&p->forks[ph.l_fork]);
 		pthread_mutex_unlock(&p->forks[ph.r_fork]);
 		smart_sleep(p->tm_sleep, p, (ph.num - 1));
