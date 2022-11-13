@@ -1,5 +1,17 @@
 #include "philo.h"
 
+void	routine_init(void *arg)
+{
+	t_philo	ph;
+	t_p		*p;
+
+	ph = *(t_philo *)arg;
+	p = ph.p;
+	if (ph.num % 2 == 0)
+		usleep(100);
+	pthread_mutex_lock(&p->forks[ph.l_fork]);
+}
+
 int	routine_fork1(void *arg)
 {
 	t_philo	ph;
@@ -7,6 +19,7 @@ int	routine_fork1(void *arg)
 
 	ph = *(t_philo *)arg;
 	p = ph.p;
+	routine_init(&ph);
 	if (!print_message(&p->ph[ph.num - 1], 'f'))
 	{
 		pthread_mutex_unlock(&p->forks[ph.l_fork]);
@@ -37,9 +50,6 @@ void	*routine(void *arg)
 	p = ph.p;
 	while (*p->is_dead == 0 && p->n_ph > *p->total_eat)
 	{
-		if (ph.num % 2 == 0)
-			usleep(100);
-		pthread_mutex_lock(&p->forks[ph.l_fork]);
 		if (!routine_fork1(&ph))
 			return (0);
 		smart_sleep(p->tm_eat, p, (ph.num - 1));
@@ -48,9 +58,12 @@ void	*routine(void *arg)
 			*p->total_eat += 1;
 		pthread_mutex_unlock(&p->forks[ph.l_fork]);
 		pthread_mutex_unlock(&p->forks[ph.r_fork]);
+		if (ph.num % 2 == 0)
+			smart_sleep(p->tm_sleep, p, (ph.num - 1));
 		if (!print_message(&p->ph[ph.num - 1], 's'))
 			return (0);
-		smart_sleep(p->tm_sleep, p, (ph.num - 1));
+		if (ph.num % 2 != 0)
+			smart_sleep(p->tm_sleep, p, (ph.num - 1));
 		if (*p->is_dead == 1 || !print_message(&p->ph[ph.num - 1], 't'))
 			return (0);
 	}
