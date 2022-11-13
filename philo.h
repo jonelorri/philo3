@@ -21,7 +21,7 @@
 
 typedef struct s_philo
 {
-	pthread_t		thread_id;
+	pthread_t		th_id;
 	int				id;
 	int				num;
 	int				l_fork;
