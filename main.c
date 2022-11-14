@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jelorria <jelorria@student.42urduli>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/14 16:17:38 by jelorria          #+#    #+#             */
+/*   Updated: 2022/11/14 16:17:40 by jelorria         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 void	routine_init(void *arg)
@@ -52,18 +64,18 @@ void	*routine(void *arg)
 	{
 		if (!routine_fork1(&ph))
 			return (0);
-		smart_sleep(p->tm_eat, p, (ph.num - 1));
+		smart_sleep(p->tm_eat, p);
 		*ph.nbr_meal += 1;
 		if (*ph.nbr_meal == p->nbr_eat)
 			*p->total_eat += 1;
 		pthread_mutex_unlock(&p->forks[ph.l_fork]);
 		pthread_mutex_unlock(&p->forks[ph.r_fork]);
 		if (ph.num % 2 == 0)
-			smart_sleep(p->tm_sleep, p, (ph.num - 1));
+			smart_sleep(p->tm_sleep, p);
 		if (!print_message(&p->ph[ph.num - 1], 's'))
 			return (0);
 		if (ph.num % 2 != 0)
-			smart_sleep(p->tm_sleep, p, (ph.num - 1));
+			smart_sleep(p->tm_sleep, p);
 		if (*p->is_dead == 1 || !print_message(&p->ph[ph.num - 1], 't'))
 			return (0);
 	}

@@ -55,6 +55,6 @@ int			execute(t_p *p);
 char		*ft_itoa(int n);
 int			print_message(void *arg, char type);
 int			print_message(void *arg, char type);
-void		smart_sleep(long long time, t_p *p, int nbr);
+void		smart_sleep(long long time, t_p *p);
 
 #endif

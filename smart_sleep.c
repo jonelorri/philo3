@@ -12,7 +12,7 @@
 
 #include "philo.h"
 
-void	smart_sleep(long long time, t_p *p, int nbr)
+void	smart_sleep(long long time, t_p *p)
 {
 	long long	i;
 

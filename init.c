@@ -34,7 +34,7 @@ void	init_vals(t_p *p, char **argv, int argc)
 	*p->is_dead = 0;
 }
 
-int	init_mutex(t_p *p, char **argv, int argc)
+int	init_mutex(t_p *p)
 {
 	p->i = p->n_ph;
 	while (--p->i >= 0)
@@ -53,7 +53,7 @@ int	init_mutex(t_p *p, char **argv, int argc)
 	return (0);
 }
 
-int	check_vals(t_p *p, char **argv, int argc)
+int	check_vals(t_p *p)
 {
 	if (p->nbr_eat <= 0)
 		return (1);
@@ -74,7 +74,7 @@ int	check_vals(t_p *p, char **argv, int argc)
 		printf("%d 1 Is dead\n", p->tm_die);
 		return (1);
 	}
-	if (init_mutex(&*p, argv, argc))
+	if (init_mutex(&*p))
 		return (1);
 	return (0);
 }
@@ -82,7 +82,7 @@ int	check_vals(t_p *p, char **argv, int argc)
 int	ft_init(t_p *p, char **argv, int argc)
 {
 	init_vals(&*p, argv, argc);
-	if (check_vals(&*p, argv, argc))
+	if (check_vals(&*p))
 		return (1);
 	p->i = p->n_ph;
 	while (--p->i >= 0)
